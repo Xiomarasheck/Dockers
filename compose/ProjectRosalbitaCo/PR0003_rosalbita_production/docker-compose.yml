@@ -1,0 +1,59 @@
+version: "3.4"
+
+#Services
+services:
+   mysql:
+    image: mysql:5.7
+    container_name: ${_REPOSITORY_NAME}_mysql
+    restart: unless-stopped
+    privileged: true
+    tty: true
+    ports:
+      - "12050:3306"
+    volumes:
+      - ./volumes/_mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: 'database_development_rosalbita'
+      MYSQL_USER: 'development' 
+      MYSQL_PASSWORD: 'rCCeF4N;k'
+      MYSQL_ROOT_PASSWORD: 'rCCeF4N;k'
+    expose:
+      - '3306'
+    networks:
+      - app-network
+
+   frontend:
+    image: rosalbita/centos_node_angular:6.9_2
+    container_name: ${_REPOSITORY_NAME}_frontend
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "12051:4200"
+      - "12052:49153"
+      - "12053:9876"
+      - "12054:49152"
+    volumes:
+      - ./volumes/_app/Frontend:/var/www/html
+    networks:
+      - app-network
+
+
+   backend:
+    image: rosalbita/centos_node:lastet
+    privileged: true
+    container_name: ${_REPOSITORY_NAME}_bakend
+    restart: unless-stopped
+    ports:
+      - "12055:3000"
+    volumes:
+      - ./volumes/_app/Backend:/var/www/html
+    expose:
+      - '3000'
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge
+
