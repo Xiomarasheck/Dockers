@@ -1,8 +1,11 @@
 FROM centos:7
 MAINTAINER BIKETRIP - Xiomara Gaona  "xiomysg1002@gmail.com"
-LABEL Vendor="BIKETRIP" \
+LABEL Vendor="Rosalbita & Co" \
       License=Commercial \
       Version=1.0
+
+RUN yum -y update; yum clean all
+RUN yum -y install systemd; yum clean all; 
 
 RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
 rm -f /lib/systemd/system/multi-user.target.wants/*;\
@@ -20,19 +23,15 @@ RUN yum -y --setopt=tsflags=nodocs update && \
     yum -y --setopt=tsflags=nodocs install redis wget unzip git && \
     yum -y --setopt=tsflags=nodocs install centos-release-scl && \
     yum -y --setopt=tsflags=nodocs install supervisor && \
-    yum -y --setopt=tsflags=nodocs install epel-release && \
-    yum -y --setopt=tsflags=nodocs install python-devel python-setuptools python-pip && \
-    pip install --upgrade pip && \
-    pip install virtualenv && \
-    pip install psycopg2-binary && \
-    mkdir /var/www && \
-    mkdir /var/www/html && \
-    cd /var/www/html && \
-    virtualenv djangoenv && \
-    source djangoenv/bin/activate && \
-    pip install django && \
-    pip install psycopg2-binary && \
-    deactivate && \
+    yum -y --setopt=tsflags=nodocs install gcc-c++ make && \
+    yum -y --setopt=tsflags=nodocs install sudo && \
+    curl -sL https://rpm.nodesource.com/setup_12.x | bash - && \
+    sudo yum clean all && sudo yum makecache fast && \
+    yum -y --setopt=tsflags=nodocs install gcc-c++ make && \
+    yum -y --setopt=tsflags=nodocs install nodejs && \ 
+    npm install -g express --save && \
+    npm install -g  eslint --save-dev &&\
+    npm install -g sequelize-cli &&\
     yum clean all && \
     systemctl enable supervisord && \
     systemctl enable crond.service && \
@@ -45,9 +44,10 @@ WORKDIR /var/www/html
 COPY supervisord.conf /etc/supervisord.conf
 COPY supervisord.d /etc/supervisord.d
 
+RUN mkdir /data
+
 VOLUME /var/www/html
 
-EXPOSE 8000
+EXPOSE 80 3000
 
 CMD ["/usr/sbin/init"]
-

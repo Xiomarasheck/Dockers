@@ -20,15 +20,26 @@ RUN yum -y --setopt=tsflags=nodocs update && \
     yum -y --setopt=tsflags=nodocs install redis wget unzip git && \
     yum -y --setopt=tsflags=nodocs install centos-release-scl && \
     yum -y --setopt=tsflags=nodocs install supervisor && \
-    yum -y --setopt=tsflags=nodocs install gcc-c++ make && \
-    yum -y --setopt=tsflags=nodocs install sudo && \
-    curl -sL https://rpm.nodesource.com/setup_12.x | bash - && \
-    sudo yum clean all && sudo yum makecache fast && \
-    yum -y --setopt=tsflags=nodocs install gcc-c++ make && \
-    yum -y --setopt=tsflags=nodocs install nodejs && \ 
-    npm install -g expo-cli && \
-    npm install -g react-native-cli && \
-    npm install -g create-react-native-app && \
+    yum -y --setopt=tsflags=nodocs install epel-release && \
+    yum -y --setopt=tsflags=nodocs install centos-release-scl && \
+    yum -y --setopt=tsflags=nodocs install install rh-python36 && \
+    yum -y --setopt=tsflags=nodocs install python3-devel python3-setuptools python3-pip && \
+    mkdir /var/www && \
+    mkdir /var/www/html && \
+    cd /var/www/html && \
+    scl enable rh-python36 bash && \
+    python3 -m venv djangoenv  && \
+    source djangoenv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install django && \
+    pip install django-allauth && \
+    pip install markdown && \
+    pip install django-filter && \
+    pip install dj-rest-auth && \
+    pip install psycopg2-binary && \
+    pip install django-rest-auth && \
+    pip install django-cors-headers && \
+    deactivate && \
     yum clean all && \
     systemctl enable supervisord && \
     systemctl enable crond.service && \
@@ -41,10 +52,9 @@ WORKDIR /var/www/html
 COPY supervisord.conf /etc/supervisord.conf
 COPY supervisord.d /etc/supervisord.d
 
-RUN mkdir /data
-
 VOLUME /var/www/html
 
-EXPOSE 80 3000
+EXPOSE 8000
 
 CMD ["/usr/sbin/init"]
+
